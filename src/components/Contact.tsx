@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PERSONAL_INFO } from '../data/portfolioData';
-import { Mail, Phone, Linkedin, Github, Send, Copy, Check, Sparkles, MessageSquare } from 'lucide-react';
+import { Mail, Phone, Linkedin, Github, Send, Copy, Check, Sparkles, MessageSquare, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export const Contact: React.FC = () => {
   const [copiedEmail, setCopiedEmail] = useState(false);
@@ -10,7 +10,8 @@ export const Contact: React.FC = () => {
     subject: '',
     message: '',
   });
-  const [sentMessage, setSentMessage] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(PERSONAL_INFO.email);
@@ -18,15 +19,46 @@ export const Contact: React.FC = () => {
     setTimeout(() => setCopiedEmail(false), 2500);
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const mailtoUrl = `mailto:${PERSONAL_INFO.email}?subject=${encodeURIComponent(
-      formData.subject || `Inquiry from ${formData.name || 'Portfolio Visitor'}`
-    )}&body=${encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
-    )}`;
-    window.location.href = mailtoUrl;
-    setSentMessage(true);
+    setIsSubmitting(true);
+    setStatus('idle');
+
+    try {
+      const response = await fetch(`https://formsubmit.co/ajax/${PERSONAL_INFO.email}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          _subject: formData.subject || `New Portfolio Message from ${formData.name}`,
+          message: formData.message,
+          _captcha: 'false',
+          _template: 'table',
+        }),
+      });
+
+      if (response.ok) {
+        setStatus('success');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        throw new Error('Form submission failed');
+      }
+    } catch {
+      // Fallback directly to mailto if external endpoint is blocked
+      const mailtoUrl = `mailto:${PERSONAL_INFO.email}?subject=${encodeURIComponent(
+        formData.subject || `Transmission from ${formData.name || 'Portfolio Visitor'}`
+      )}&body=${encodeURIComponent(
+        `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
+      )}`;
+      window.location.href = mailtoUrl;
+      setStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -138,8 +170,8 @@ export const Contact: React.FC = () => {
                 Send Direct Transmission
               </h3>
             </div>
-            <span className="text-[10px] font-mono text-slate-400">
-              FAST DISPATCH
+            <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-500/30">
+              DIRECT TO GMAIL
             </span>
           </div>
 
@@ -204,16 +236,38 @@ export const Contact: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-xs sm:text-sm text-dark-950 bg-gradient-to-r from-cyan-400 via-cyan-300 to-indigo-300 hover:from-cyan-300 hover:to-indigo-200 transition-all duration-300 shadow-md shadow-cyan-500/20"
+              disabled={isSubmitting}
+              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-xs sm:text-sm text-dark-950 bg-gradient-to-r from-cyan-400 via-cyan-300 to-indigo-300 hover:from-cyan-300 hover:to-indigo-200 transition-all duration-300 shadow-md shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Send className="w-4 h-4 text-dark-950" />
-              <span>Dispatch Transmission</span>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 text-dark-950 animate-spin" />
+                  <span>Dispatching Transmission...</span>
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4 text-dark-950" />
+                  <span>Dispatch Transmission</span>
+                </>
+              )}
             </button>
 
-            {sentMessage && (
-              <p className="text-center text-xs font-mono text-emerald-400 animate-in fade-in">
-                ✓ Email client launched with formatted transmission payload.
-              </p>
+            {status === 'success' && (
+              <div className="p-3.5 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-xs font-mono text-emerald-300 flex items-center gap-2.5 animate-in fade-in">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <span>
+                  Transmission successfully dispatched! Your message has been sent directly to raghavmishra111122@gmail.com.
+                </span>
+              </div>
+            )}
+
+            {status === 'error' && (
+              <div className="p-3.5 rounded-xl bg-amber-950/80 border border-amber-500/40 text-xs font-mono text-amber-300 flex items-center gap-2.5 animate-in fade-in">
+                <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                <span>
+                  Launched your default email client with the message pre-filled to dispatch to raghavmishra111122@gmail.com.
+                </span>
+              </div>
             )}
           </form>
         </div>
