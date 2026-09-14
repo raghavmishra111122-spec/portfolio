@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PERSONAL_INFO } from '../data/portfolioData';
-import { Mail, Phone, Linkedin, Github, Send, Copy, Check, Sparkles, MessageSquare, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Mail, Phone, Linkedin, Github, Send, Copy, Check, Sparkles, MessageSquare, ExternalLink } from 'lucide-react';
 
 export const Contact: React.FC = () => {
   const [copiedEmail, setCopiedEmail] = useState(false);
@@ -10,8 +10,13 @@ export const Contact: React.FC = () => {
     subject: '',
     message: '',
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [returnUrl, setReturnUrl] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setReturnUrl(window.location.href);
+    }
+  }, []);
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(PERSONAL_INFO.email);
@@ -19,46 +24,13 @@ export const Contact: React.FC = () => {
     setTimeout(() => setCopiedEmail(false), 2500);
   };
 
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setStatus('idle');
-
-    try {
-      const response = await fetch(`https://formsubmit.co/ajax/${PERSONAL_INFO.email}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          _subject: formData.subject || `New Portfolio Message from ${formData.name}`,
-          message: formData.message,
-          _captcha: 'false',
-          _template: 'table',
-        }),
-      });
-
-      if (response.ok) {
-        setStatus('success');
-        setFormData({ name: '', email: '', subject: '', message: '' });
-      } else {
-        throw new Error('Form submission failed');
-      }
-    } catch {
-      // Fallback directly to mailto if external endpoint is blocked
-      const mailtoUrl = `mailto:${PERSONAL_INFO.email}?subject=${encodeURIComponent(
-        formData.subject || `Transmission from ${formData.name || 'Portfolio Visitor'}`
-      )}&body=${encodeURIComponent(
-        `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
-      )}`;
-      window.location.href = mailtoUrl;
-      setStatus('error');
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleGmailClick = () => {
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${PERSONAL_INFO.email}&su=${encodeURIComponent(
+      formData.subject || `Inquiry from ${formData.name || 'Portfolio Visitor'}`
+    )}&body=${encodeURIComponent(
+      `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
+    )}`;
+    window.open(gmailUrl, '_blank');
   };
 
   return (
@@ -88,6 +60,7 @@ export const Contact: React.FC = () => {
                 <span>DIRECT EMAIL</span>
               </div>
               <button
+                type="button"
                 onClick={handleCopyEmail}
                 className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-1 rounded bg-dark-950 border border-slate-800 text-slate-300 hover:text-cyan-300 transition-colors"
                 title="Copy Email Address"
@@ -175,7 +148,17 @@ export const Contact: React.FC = () => {
             </span>
           </div>
 
-          <form onSubmit={handleFormSubmit} className="space-y-4">
+          <form
+            action={`https://formsubmit.co/${PERSONAL_INFO.email}`}
+            method="POST"
+            className="space-y-4"
+          >
+            {/* Hidden FormSubmit Configuration */}
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="_template" value="table" />
+            <input type="hidden" name="_subject" value={`New Portfolio Transmission from ${formData.name || 'Visitor'}`} />
+            {returnUrl && <input type="hidden" name="_next" value={returnUrl} />}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-mono text-slate-400 mb-1.5">
@@ -183,6 +166,7 @@ export const Contact: React.FC = () => {
                 </label>
                 <input
                   type="text"
+                  name="name"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -197,6 +181,7 @@ export const Contact: React.FC = () => {
                 </label>
                 <input
                   type="email"
+                  name="email"
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -212,6 +197,7 @@ export const Contact: React.FC = () => {
               </label>
               <input
                 type="text"
+                name="subject"
                 required
                 value={formData.subject}
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
@@ -225,6 +211,7 @@ export const Contact: React.FC = () => {
                 Message Content
               </label>
               <textarea
+                name="message"
                 rows={4}
                 required
                 value={formData.message}
@@ -234,41 +221,25 @@ export const Contact: React.FC = () => {
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-xs sm:text-sm text-dark-950 bg-gradient-to-r from-cyan-400 via-cyan-300 to-indigo-300 hover:from-cyan-300 hover:to-indigo-200 transition-all duration-300 shadow-md shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 text-dark-950 animate-spin" />
-                  <span>Dispatching Transmission...</span>
-                </>
-              ) : (
-                <>
-                  <Send className="w-4 h-4 text-dark-950" />
-                  <span>Dispatch Transmission</span>
-                </>
-              )}
-            </button>
+            <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
+              <button
+                type="submit"
+                className="w-full sm:flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-xs sm:text-sm text-dark-950 bg-gradient-to-r from-cyan-400 via-cyan-300 to-indigo-300 hover:from-cyan-300 hover:to-indigo-200 transition-all duration-300 shadow-md shadow-cyan-500/20"
+              >
+                <Send className="w-4 h-4 text-dark-950" />
+                <span>Dispatch Transmission</span>
+              </button>
 
-            {status === 'success' && (
-              <div className="p-3.5 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-xs font-mono text-emerald-300 flex items-center gap-2.5 animate-in fade-in">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>
-                  Transmission successfully dispatched! Your message has been sent directly to raghavmishra111122@gmail.com.
-                </span>
-              </div>
-            )}
-
-            {status === 'error' && (
-              <div className="p-3.5 rounded-xl bg-amber-950/80 border border-amber-500/40 text-xs font-mono text-amber-300 flex items-center gap-2.5 animate-in fade-in">
-                <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                <span>
-                  Launched your default email client with the message pre-filled to dispatch to raghavmishra111122@gmail.com.
-                </span>
-              </div>
-            )}
+              <button
+                type="button"
+                onClick={handleGmailClick}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl text-xs font-mono text-slate-300 bg-dark-950 hover:bg-slate-900 border border-slate-800 hover:border-cyan-500/40 transition-colors"
+                title="Open in Gmail"
+              >
+                <span>Open in Gmail</span>
+                <ExternalLink className="w-3.5 h-3.5 text-cyan-400" />
+              </button>
+            </div>
           </form>
         </div>
       </div>
