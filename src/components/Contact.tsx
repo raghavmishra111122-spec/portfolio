@@ -113,7 +113,7 @@ export const Contact: React.FC = () => {
             >
               <Linkedin className="w-5 h-5 text-cyan-400 mb-2 group-hover:scale-110 transition-transform" />
               <div className="text-xs font-bold text-white">LinkedIn</div>
-              <div className="text-[10px] font-mono text-slate-400 truncate">in/raghav-mishra</div>
+              <div className="text-[10px] font-mono text-slate-400 truncate">in/raghav-mishra-866063253</div>
             </a>
 
             <a
