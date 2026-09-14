@@ -43,7 +43,7 @@ export const GitHubSection: React.FC = () => {
               <div className="flex items-center justify-between text-xs font-mono text-slate-400 mb-1">
                 <span className="flex items-center gap-1.5 text-white font-semibold">
                   <FolderGit2 className="w-3.5 h-3.5 text-cyan-400" />
-                  -AI-Revenue-Recovery-System-RazorPay
+                  AI-Revenue-Recovery-System
                 </span>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/30">
                   Python

@@ -297,7 +297,7 @@ export const PROJECTS: Project[] = [
   {
     id: 'ai-revenue-recovery',
     number: '01',
-    title: 'AI Revenue Recovery System — Razorpay',
+    title: 'AI Revenue Recovery System',
     category: 'AI Engineering • Revenue Recovery • Evaluation • Backend Systems',
     status: 'COMPLETED / FEATURED',
     featured: true,
