@@ -3,7 +3,7 @@ import { Project, ExperienceItem, EducationItem, SkillCategory, AIPipelineStep, 
 export const PERSONAL_INFO = {
   name: 'Raghav Mishra',
   initials: 'RM',
-  currentRole: 'LLM Post-Training L1',
+  currentRole: 'LLM Post Training Expert L1',
   company: 'Ethara AI',
   statusBadge: 'Currently working in AI / LLM',
   location: 'Kanpur, India',
@@ -21,12 +21,12 @@ export const EXPERIENCES: ExperienceItem[] = [
   {
     id: 'ethara-ai',
     company: 'Ethara AI',
-    role: 'LLM Post-Training L1',
+    role: 'LLM Post Training Expert L1',
     period: 'Current Role',
     status: 'Active',
     isCurrent: true,
     tagline: 'Improving and evaluating intelligent AI systems through structured post-training workflows.',
-    overview: 'Serving as an LLM Post-Training L1 professional at Ethara AI, focusing on AI evaluation, model quality optimization, human feedback alignment, and quality-driven AI workflows.',
+    overview: 'Serving as an LLM Post Training Expert L1 professional at Ethara AI, focusing on AI evaluation, model quality optimization, human feedback alignment, and quality-driven AI workflows.',
     responsibilities: [
       'Engaging in LLM post-training workflows to improve model behavior and alignment.',
       'Performing systematic AI evaluation and response quality benchmarking.',

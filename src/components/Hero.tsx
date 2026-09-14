@@ -37,7 +37,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick, onConnectClick }) =>
         <div className="flex items-center justify-center gap-2 mb-6 flex-wrap">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-200 font-mono text-sm sm:text-base font-semibold shadow-inner">
             <Cpu className="w-4 h-4 text-cyan-400" />
-            <span>LLM Post-Training L1</span>
+            <span>LLM Post Training Expert L1</span>
             <span className="text-slate-500">@</span>
             <span className="text-cyan-300 font-bold tracking-wide">Ethara AI</span>
           </div>

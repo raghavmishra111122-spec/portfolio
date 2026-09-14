@@ -23,7 +23,7 @@ export const About: React.FC = () => {
         {/* Left Column: Concise Narrative */}
         <div className="lg:col-span-7 space-y-6 text-slate-300 text-sm sm:text-base leading-relaxed">
           <p className="p-4 rounded-xl bg-dark-900/60 border border-slate-850">
-            I am an <strong className="text-white font-semibold">AI &amp; LLM professional</strong> currently working as an <span className="text-cyan-300 font-medium">LLM Post-Training L1 at Ethara AI</span>. My work centers on improving, evaluating, and shaping intelligent AI systems through structured post-training workflows, rubric-driven evaluation, and quality-focused feedback cycles.
+            I am an <strong className="text-white font-semibold">AI &amp; LLM professional</strong> currently working as an <span className="text-cyan-300 font-medium">LLM Post Training Expert L1 at Ethara AI</span>. My work centers on improving, evaluating, and shaping intelligent AI systems through structured post-training workflows, rubric-driven evaluation, and quality-focused feedback cycles.
           </p>
 
           <p>
